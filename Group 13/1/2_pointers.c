@@ -6,15 +6,15 @@
 int main(int argc, char **argv)
 //char** means an array of character arrays = array of strings
 {
-    int n;
-    n = 25;
+    int n = 25;
+    int *k = &n; // pointer assignment
 
-    int *k = n; // pointer
-    //int k = &n; // k az n memória címével
-
-    printf("n = %i\n", n);
-    //printf("k = %x\n", k);   // address
-    printf("k = %i\n", k);
+    printf("n = %i\n", n);  // Prints 25
+    printf("k = %p\n", (void*)k);  // Prints the address of n
+    printf("*k = %i\n", *k);  // Prints the value stored at address k (which is 25)
 
     return 0;
 }
+
+// %p is the proper way to print a pointer in C
+// *k (dereferencing) gives the value stored at n, which is 25

@@ -16,7 +16,7 @@ int main()
   //char str1[80]; //it would be an 80 characters long empty "string", - it is empty
   char str1[] = "Hello world"; //it's length is the length of the text
   printf("The content of variable str1: \'%s\'\n", str1);
-  printf("Array 11 is: %c\n", str1[10]);
+  printf("Array 10 is: %c\n", str1[10]);
   //1. parameter formatstring, next parameter(s) variables
   //%s = string, %i = integer \n = new line e.g.
 
