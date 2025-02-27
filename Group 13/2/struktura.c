@@ -16,8 +16,10 @@ unsigned int id = 1;
 
 void read_in_console_messages(const char *console_text, char *result)
 {
-    printf(console_text);
+    printf("%s", console_text);
     scanf("\n%[^\t\n]s", result);
+    // scanf(" %49[^\t\n]", result); // Prevents buffer overflow
+    // scanf to limit the input length. If result is a char[50], allow only 49 characters (%49[^\t\n]s)
 }
 
 void file_creation()
@@ -29,6 +31,7 @@ void file_creation()
 struct driver *file_read(FILE *file)
 {
     struct driver *actual = (struct driver *)malloc(sizeof(struct driver));
+    if (!actual) return NULL;
     // The C library function int fscanf(FILE *stream, const char *format, ...) reads formatted input from a stream.
     fscanf(file, "%u\t%[^\t]\t%s\t%s\t%u", &(actual->id), actual->name, actual->email, actual->phone, &(actual->exp));
     return actual;
@@ -120,14 +123,14 @@ void driver_creation(const struct driver *createdriver)
         fprintf(stderr, "\nHiba fajl megnyitaskor\n");
         exit(1);
     }
-    fprintf(outfile, "%u\t%s\t%s\t%s\t%u\n", a.id, a.name, a.email, a.phone, a.exp);
-    if (fprintf != 0)
+    int written = fprintf(outfile, "%u\t%s\t%s\t%s\t%u\n", a.id, a.name, a.email, a.phone, a.exp);
+    if (written < 0)
     {
-        printf("A felvetel sikeres volt !\n");
+        printf("Hiba az irasnal!\n");
     }
     else
     {
-        printf("Hiba az irasnal!\n");
+        printf("A felvetel sikeres volt !\n");
     }
 
     fclose(outfile);
