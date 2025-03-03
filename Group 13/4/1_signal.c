@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <signal.h>
+#include <unistd.h>
 
 /*
 A signal is a software generated interrupt that is sent to a process by
