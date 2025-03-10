@@ -55,17 +55,20 @@ int main() {
     // Creates two signal sets:
     // - mask (which will contain SIGUSR1)
     // - oldmask (to store the previous signal mask)
+    // mask contains SIGUSR1 (which we blocked).
+    // oldmask contains the previous signal mask (which did not block SIGUSR1).
     sigset_t mask, oldmask;
     sigemptyset(&mask); // Initializes mask to be empty.
     sigaddset(&mask, SIGUSR1); //  Adds SIGUSR1 to mask, meaning we want to block it. -> Ensures that the signals aren't accidentally handled before we call sigsuspend()   We only want to process signals when we are explicitly waiting for them
     // Blocks SIGUSR1, preventing it from being handled until we’re ready. 
     // Saves the previous signal mask in oldmask, so we can restore it later.
-    sigprocmask(SIG_BLOCK, &mask, &oldmask); 
+    sigprocmask(SIG_BLOCK, &mask, &oldmask); // Blocks SIGUSR1, so it cannot be delivered yet. Saves the old signal mask (the state before blocking SIGUSR1) in oldmask.
 
     // Temporarily unblocks SIGUSR1 and pauses execution until a signal arrives. -> When SIGUSR1 arrives from child1(), 
     // the process wakes up and executes signal_handler(), then resumes execution after sigsuspend().
     // First wait (for first child signal)
-    sigsuspend(&oldmask);
+    sigsuspend(&oldmask); // -> &oldmask IMPORTANT -> Temporarily restores the signal mask to oldmask (which means SIGUSR1 is no longer blocked).
+    // sigsuspend(&mask); // Wrong! Still blocks SIGUSR1 -> Then SIGUSR1 would still be blocked, and sigsuspend() would never return because it would never receive SIGUSR1!
     printf("Child1 signal received!\n");
 
     // The process is suspended again until another SIGUSR1 arrives.
