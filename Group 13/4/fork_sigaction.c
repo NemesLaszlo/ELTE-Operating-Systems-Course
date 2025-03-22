@@ -84,7 +84,13 @@ int main() {
 
     // Wait for first child
     int status1;
+    // pid_t waitpid(pid_t pid, int *status, int options);
     pid_t finished1 = waitpid(c1, &status1, 0);
+    // 0 → Default behavior (waits until the child terminates).
+    // WNOHANG → Returns immediately if no child has exited.
+    // WUNTRACED → Returns if a child process is stopped.
+    // WCONTINUED → Returns if a child continues after SIGCONT.
+
     if (WIFEXITED(status1)) {
         printf("Child1 (PID %d) exited with status %d\n", finished1, WEXITSTATUS(status1));
     }

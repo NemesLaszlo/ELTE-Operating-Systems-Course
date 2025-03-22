@@ -80,7 +80,8 @@ int main(int argc, char *argv[])
     if (child > 0)
     {
         szulo(uzenetsor); // Parent sends a message.
-        wait(NULL);
+        // pid_t waitpid(pid_t pid, int *status, int options);
+        waitpid(child, NULL, 0); 
         // After terminating child process, the message queue is deleted.
         status = msgctl(uzenetsor, IPC_RMID, NULL);
         if (status < 0)
