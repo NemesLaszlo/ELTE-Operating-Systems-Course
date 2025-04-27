@@ -79,14 +79,18 @@ void starthandler(int sig)
 
 void generateQuestions(Question *questionArray[], const char *questionSentences[], int arraySize)
 {
+    srand(time(NULL));
     for (int i = 0; i < arraySize; i++)
     {
-        srand(time(NULL));
         int randomAnswer = rand() % 5 + 1;
         questionArray[i] = malloc(sizeof(Question));
-        questionArray[i]->question = strdup(questionSentences[i]);
+        questionArray[i]->question = strdup(questionSentences[i]); // Copies the i-th question sentence (the text) into newly allocated memory
         questionArray[i]->answer = randomAnswer;
     }
+    // potentioal checks for malloc and strdup
+    // if (!questionArray[i]) { perror("malloc"); exit(EXIT_FAILURE); }
+    // if (!questionArray[i]->question) { perror("strdup"); exit(EXIT_FAILURE); }
+
 }
 
 char *evaluate(int playerAnswer, int goodAnswer)
@@ -209,7 +213,7 @@ int main(int argc, char **argv)
     }
 
     int sh_mem_id;
-    sh_mem_id = shmget(mainKey, sizeof(s), IPC_CREAT | S_IRUSR | S_IWUSR);
+    sh_mem_id = shmget(mainKey, sizeof(struct sharedData), IPC_CREAT | S_IRUSR | S_IWUSR);
     s = shmat(sh_mem_id, NULL, 0);
 
     semid = semaphoreCreation(argv[0], 1);
@@ -267,14 +271,14 @@ int main(int argc, char **argv)
     };
 
     int N = 3;
-    Question *questions[N];
+    Question *questions[N]; // array of N pointers to Question objects
     generateQuestions(questions, questionSentences, N);
 
     srand(time(NULL));
     int randomQuestion = rand() % 3;
     printf("Kerdes adatok: %s, %i, %li\n", questions[randomQuestion]->question, questions[randomQuestion]->answer, strlen(questions[randomQuestion]->question));
-    write(io_pipes[1], questions[randomQuestion]->question, strlen(questions[randomQuestion]->question));
-    write(io_pipes2[1], questions[randomQuestion]->question, strlen(questions[randomQuestion]->question));
+    write(io_pipes[1], questions[randomQuestion]->question, strlen(questions[randomQuestion]->question) + 1); // strlen only counts characters -> not sending the NULL terminator (\0) -> + 1
+    write(io_pipes2[1], questions[randomQuestion]->question, strlen(questions[randomQuestion]->question) + 1); // Otherwise, when the child reads the string, it may not be properly terminated
 
     int firstAnswer;
     int secondAnswer;
@@ -324,10 +328,16 @@ int main(int argc, char **argv)
     waitpid(child2_pid, &status, 0);
     printf("Masodik jatekos - terminated with status: %d\n", status);
 
+    // there are no memory leaks
+    // questions[i] points to a Question structure allocated with malloc
+    // questionArray[i]->question was allocated separately with strdup
+    // so you first free the char *question (string) inside the structure, and then free the Question * itself
     for (int i = 0; i < N; i++)
     {
         free(questions[i]->question);
+        questions[i]->question = NULL;
         free(questions[i]);
+        questions[i] = NULL;
     }
     free(firstResult);
     free(secResult);

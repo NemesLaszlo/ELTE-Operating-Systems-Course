@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
     struct sharedData *s;
 
     kulcs = ftok(argv[0], 1);
-    sh_mem_id = shmget(kulcs, sizeof(s), IPC_CREAT | S_IRUSR | S_IWUSR);
+    sh_mem_id = shmget(kulcs, sizeof(struct sharedData), IPC_CREAT | S_IRUSR | S_IWUSR);
     s = shmat(sh_mem_id, NULL, 0);
 
     semid = szemafor_letrehozas(argv[0], 1);
