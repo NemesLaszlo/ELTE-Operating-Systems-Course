@@ -5,7 +5,6 @@
 #include "stdio.h"
 #include "string.h"
 #include "time.h"
-#include "wait.h"
 #include "sys/ipc.h"
 #include "sys/msg.h"
 #include "sys/shm.h"
@@ -340,8 +339,11 @@ int main(int argc, char **argv)
         questions[i] = NULL;
     }
     free(firstResult);
+    firstResult = NULL;
     free(secResult);
+    secResult = NULL;
     free(guessValue);
+    guessValue = NULL;
 
     close(io_pipes[0]);
     close(io_pipes[1]);
